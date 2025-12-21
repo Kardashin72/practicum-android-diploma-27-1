@@ -3,7 +3,7 @@ package ru.practicum.android.diploma.search.di
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
-//будет завершено после окончания настройки Network
+// будет завершено после окончания настройки Network
 val searchModule = module {
     // Context для NetworkConnectionChecker
     single { androidContext() }
