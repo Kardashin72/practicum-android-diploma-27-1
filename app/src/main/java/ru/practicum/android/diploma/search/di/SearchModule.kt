@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.search.di
 
 import okhttp3.OkHttpClient
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,6 +14,7 @@ import ru.practicum.android.diploma.search.data.network.VacancyRepositoryImpl
 import ru.practicum.android.diploma.search.domain.api.VacancyInteractor
 import ru.practicum.android.diploma.search.domain.api.VacancyRepository
 import ru.practicum.android.diploma.search.domain.impl.VacancyInteractorImpl
+import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 import ru.practicum.android.diploma.search.utils.NetworkConnectionChecker
 
 // utils и mapper
@@ -56,7 +58,6 @@ fun provideVacancyApi(retrofit: Retrofit): VacancyApi {
     return retrofit.create(VacancyApi::class.java)
 }
 
-// пока комментирую
-// val viewModelModule = module {
-//    viewModel { SearchViewModel(get()) }
-// }
+ val viewModelModule = module {
+    viewModel { SearchViewModel(get()) }
+ }
