@@ -57,6 +57,6 @@ fun provideVacancyApi(retrofit: Retrofit): VacancyApi {
 }
 
 // пока комментирую
-//val viewModelModule = module {
+// val viewModelModule = module {
 //    viewModel { SearchViewModel(get()) }
-//}
+// }

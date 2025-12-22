@@ -19,11 +19,11 @@ val databaseModule = module {
 }
 
 // пока комментирую
-//val repositoryModule = module {
+// val repositoryModule = module {
 //    single { FavoriteVacancyRepository(get()) }
-//}
+// }
 
 // пока комментирую
-//val viewModelModule = module {
+// val viewModelModule = module {
 //    viewModel { FavoritesVacanciesViewModel(get()) }
-//}
+// }
