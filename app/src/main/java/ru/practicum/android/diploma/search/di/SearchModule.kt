@@ -14,6 +14,8 @@ import ru.practicum.android.diploma.search.data.network.VacancyRepositoryImpl
 import ru.practicum.android.diploma.search.domain.api.VacancyInteractor
 import ru.practicum.android.diploma.search.domain.api.VacancyRepository
 import ru.practicum.android.diploma.search.domain.impl.VacancyInteractorImpl
+import ru.practicum.android.diploma.search.presentation.viewmodel.SearchFiltersViewModel
+import ru.practicum.android.diploma.search.presentation.viewmodel.SearchIndustryFilterViewModel
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 import ru.practicum.android.diploma.search.utils.NetworkConnectionChecker
 
@@ -58,6 +60,8 @@ fun provideVacancyApi(retrofit: Retrofit): VacancyApi {
     return retrofit.create(VacancyApi::class.java)
 }
 
- val viewModelModule = module {
+val viewModelModule = module {
     viewModel { SearchViewModel(get()) }
- }
+    viewModel { SearchFiltersViewModel() }
+    viewModel { SearchIndustryFilterViewModel(get()) }
+}

@@ -2,9 +2,11 @@ package ru.practicum.android.diploma.favorites.vacansies.di
 
 import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import ru.practicum.android.diploma.favorites.vacansies.data.FavoritesDatabase
 import ru.practicum.android.diploma.favorites.vacansies.data.db.dao.FavoriteVacancyDao
+import ru.practicum.android.diploma.favorites.vacansies.presentation.viewmodel.FavoritesVacanciesViewModel
 
 val databaseModule = module {
     single<FavoritesDatabase> {
@@ -24,6 +26,6 @@ val databaseModule = module {
 // }
 
 // пока комментирую
-// val viewModelModule = module {
-//    viewModel { FavoritesVacanciesViewModel(get()) }
-// }
+val viewModelModule = module {
+    viewModel { FavoritesVacanciesViewModel() }
+}
