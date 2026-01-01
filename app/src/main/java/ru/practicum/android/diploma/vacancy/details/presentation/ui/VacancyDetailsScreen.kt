@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.practicum.android.diploma.R
 
+// пустой комментарии для создания ПР
 @Composable
 fun VacancyDetailsScreen(
     onBack: () -> Unit,
