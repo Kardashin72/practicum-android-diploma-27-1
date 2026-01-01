@@ -15,9 +15,7 @@ class VacancyDetailsFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                VacancyDetailsScreen(
-                    onBack = { navigateBack() }
-                )
+                // пока заглушка
             }
         }
     }
