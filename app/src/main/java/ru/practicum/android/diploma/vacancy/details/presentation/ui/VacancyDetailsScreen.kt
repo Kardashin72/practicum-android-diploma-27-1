@@ -93,54 +93,13 @@ fun VacancyDetailsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                isLoading -> {
-                    Loading(Modifier.fillMaxSize())
-                }
-
-                error != null -> {
-                    val isInternetError = error.message == stringResource(R.string.error_no_internet)
-                    val isNotFoundError = error.message == stringResource(R.string.error_404_not_found)
-
-                    when {
-                        isInternetError -> {
-                            PlaceHolder(
-                                placeholderImage = R.drawable.internet_connection_error_placeholder,
-                                placeholderText = R.string.error_no_internet
-                            )
-                        }
-
-                        isNotFoundError -> {
-                            PlaceHolder(
-                                placeholderImage = R.drawable.vacancy_not_found_placeholder,
-                                placeholderText = R.string.vacancy_not_found
-                            )
-                        }
-
-                        else -> {
-                            PlaceHolder(
-                                placeholderImage = R.drawable.vacancy_details_server_error_placeholder,
-                                placeholderText = R.string.error_server
-                            )
-                        }
-                    }
-                }
-
-                vacancy != null -> {
-                    VacancyDetailsContent(
-                        vacancy = vacancy,
-                        onPhoneClick = onPhoneClick,
-                        onEmailClick = onEmailClick
-                    )
-                }
-
-                else -> {
-                    Text(
-                        text = stringResource(R.string.vacancy_details_no_data),
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
+            VacancyDetailsBody(
+                vacancy = vacancy,
+                isLoading = isLoading,
+                error = error,
+                onPhoneClick = onPhoneClick,
+                onEmailClick = onEmailClick
+            )
         }
     }
 }
@@ -182,6 +141,69 @@ private fun VacancyDetailsContent(
                 )
             }
             item { VacancyContacts(contacts, onPhoneClick, onEmailClick) }
+        }
+    }
+}
+
+@Composable
+private fun VacancyDetailsBody(
+    vacancy: VacancyDetail?,
+    isLoading: Boolean,
+    error: Throwable?,
+    onPhoneClick: (String) -> Unit,
+    onEmailClick: (String) -> Unit,
+) {
+    when {
+        isLoading -> {
+            Loading(Modifier.fillMaxSize())
+        }
+
+        error != null -> {
+            VacancyDetailsError(error)
+        }
+
+        vacancy != null -> {
+            VacancyDetailsContent(
+                vacancy = vacancy,
+                onPhoneClick = onPhoneClick,
+                onEmailClick = onEmailClick
+            )
+        }
+
+        else -> {
+            Text(
+                text = stringResource(R.string.vacancy_details_no_data),
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun VacancyDetailsError(error: Throwable) {
+    val isInternetError = error.message == stringResource(R.string.error_no_internet)
+    val isNotFoundError = error.message == stringResource(R.string.error_404_not_found)
+
+    when {
+        isInternetError -> {
+            PlaceHolder(
+                placeholderImage = R.drawable.internet_connection_error_placeholder,
+                placeholderText = R.string.error_no_internet
+            )
+        }
+
+        isNotFoundError -> {
+            PlaceHolder(
+                placeholderImage = R.drawable.vacancy_not_found_placeholder,
+                placeholderText = R.string.vacancy_not_found
+            )
+        }
+
+        else -> {
+            PlaceHolder(
+                placeholderImage = R.drawable.vacancy_details_server_error_placeholder,
+                placeholderText = R.string.error_server
+            )
         }
     }
 }

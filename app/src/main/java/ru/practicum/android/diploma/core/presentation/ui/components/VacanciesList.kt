@@ -79,6 +79,7 @@ fun VacanciesList(
 
 }
 
+@Suppress("MagicNumber")
 @Preview(showBackground = true)
 @Composable
 private fun VacanciesListPreview() {
