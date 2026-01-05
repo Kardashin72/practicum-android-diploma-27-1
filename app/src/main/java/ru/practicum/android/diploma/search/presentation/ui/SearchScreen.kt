@@ -41,7 +41,6 @@ import ru.practicum.android.diploma.core.presentation.ui.theme.dp16
 import ru.practicum.android.diploma.core.presentation.ui.theme.dp20
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchState
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
-import ru.practicum.android.diploma.search.presentation.viewmodel.SearchTextFieldState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,10 +54,22 @@ fun SearchScreen(
     val foundVacancies by viewModel.foundVacancies.collectAsState()
     val paginationErrorMessage by viewModel.paginationErrorMessage.collectAsState()
 
-    HandlePaginationErrorToast(
-        paginationErrorMessage = paginationErrorMessage,
-        onErrorShown = viewModel::onPaginationErrorShown
-    )
+    val context = LocalContext.current
+
+    if (paginationErrorMessage != null) {
+        val toastText = when (paginationErrorMessage) {
+            stringResource(R.string.error_no_internet),
+            stringResource(R.string.error_poor_connection) ->
+                stringResource(R.string.toast_check_internet)
+
+            else ->
+                stringResource(R.string.toast_generic_error)
+        }
+
+        Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
+        viewModel.onPaginationErrorShown()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -93,112 +104,71 @@ fun SearchScreen(
                 onClearIcClick = viewModel::onClearIcClick,
             )
 
-            SearchContentStateContent(
-                searchState = searchState,
-                textFieldState = textFieldState,
-                foundVacancies = foundVacancies,
-                onOpenVacancyDetails = onOpenVacancyDetails,
-                onLoadNextPage = viewModel::onLoadNextPage
-            )
-        }
-    }
-}
+            when (searchState) {
+                is SearchState.Content -> {
+                    val data = (searchState as SearchState.Content).data
+                    if (textFieldState.isShowClearIc) {
+                        SearchResultBanner(
+                            foundVacancies = foundVacancies,
+                            isEmptyResult = data.isEmpty()
+                        )
+                    }
+                    if (data.isEmpty()) {
+                        if (textFieldState.isShowClearIc) {
+                            PlaceHolder(
+                                placeholderImage = R.drawable.get_items_error_placeholder,
+                                placeholderText = R.string.get_vacancies_error,
+                            )
+                        }
+                    } else {
+                        VacanciesList(
+                            data,
+                            onVacancyClick = onOpenVacancyDetails,
+                            onLoadNextPage = viewModel::onLoadNextPage,
+                            isLoading = (searchState as SearchState.Content).isLoading,
+                        )
+                    }
+                }
 
-@Composable
-private fun HandlePaginationErrorToast(
-    paginationErrorMessage: String?,
-    onErrorShown: () -> Unit,
-) {
-    val context = LocalContext.current
+                is SearchState.Loading -> Loading(Modifier.fillMaxSize())
+                is SearchState.Error -> {
+                    val message = (searchState as SearchState.Error).message
+                    val drawableId =
+                        when (message) {
+                            stringResource(R.string.error_no_internet) ->
+                                R.drawable.internet_connection_error_placeholder
 
-    if (paginationErrorMessage == null) return
+                            stringResource(R.string.error_server) ->
+                                R.drawable.search_server_error_placeholder
 
-    val toastText = when (paginationErrorMessage) {
-        stringResource(R.string.error_no_internet),
-        stringResource(R.string.error_poor_connection) ->
-            stringResource(R.string.toast_check_internet)
+                            stringResource(R.string.error_poor_connection) ->
+                                R.drawable.internet_connection_error_placeholder
 
-        else ->
-            stringResource(R.string.toast_generic_error)
-    }
+                            else ->
+                                R.drawable.get_items_error_placeholder
+                        }
+                    val placeholderMessageId =
+                        when (drawableId) {
+                            R.drawable.internet_connection_error_placeholder ->
+                                R.string.error_no_internet
 
-    Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show()
-    onErrorShown()
-}
+                            R.drawable.search_server_error_placeholder ->
+                                R.string.error_server
 
-@Composable
-private fun SearchContentStateContent(
-    searchState: SearchState,
-    textFieldState: SearchTextFieldState,
-    foundVacancies: Int,
-    onOpenVacancyDetails: (String) -> Unit,
-    onLoadNextPage: () -> Unit,
-) {
-    when (val state = searchState) {
-        is SearchState.Content -> {
-            val data = state.data
-
-            if (textFieldState.isShowClearIc) {
-                SearchResultBanner(
-                    foundVacancies = foundVacancies,
-                    isEmptyResult = data.isEmpty()
-                )
-            }
-
-            if (data.isEmpty()) {
-                if (textFieldState.isShowClearIc) {
+                            else ->
+                                R.string.get_vacancies_error
+                        }
                     PlaceHolder(
-                        placeholderImage = R.drawable.get_items_error_placeholder,
-                        placeholderText = R.string.get_vacancies_error,
+                        drawableId,
+                        placeholderMessageId
                     )
                 }
-            } else {
-                VacanciesList(
-                    vacancies = data,
-                    onVacancyClick = onOpenVacancyDetails,
-                    onLoadNextPage = onLoadNextPage,
-                    isLoading = state.isLoading,
-                )
-            }
-        }
 
-        is SearchState.Loading -> Loading(Modifier.fillMaxSize())
-
-        is SearchState.Error -> {
-            val drawableId =
-                when (state.message) {
-                    stringResource(R.string.error_no_internet) ->
-                        R.drawable.internet_connection_error_placeholder
-
-                    stringResource(R.string.error_server) ->
-                        R.drawable.search_server_error_placeholder
-
-                    stringResource(R.string.error_poor_connection) ->
-                        R.drawable.internet_connection_error_placeholder
-
-                    else ->
-                        R.drawable.get_items_error_placeholder
+                is SearchState.Nothing -> {
+                    if (textFieldState.query.isEmpty()) {
+                        PlaceHolder(R.drawable.search_main_placeholder)
+                    }
                 }
-            val placeholderMessageId =
-                when (drawableId) {
-                    R.drawable.internet_connection_error_placeholder ->
-                        R.string.error_no_internet
-
-                    R.drawable.search_server_error_placeholder ->
-                        R.string.error_server
-
-                    else ->
-                        R.string.get_vacancies_error
-                }
-            PlaceHolder(
-                drawableId,
-                placeholderMessageId
-            )
-        }
-
-        is SearchState.Nothing -> {
-            if (textFieldState.query.isEmpty()) {
-                PlaceHolder(R.drawable.search_main_placeholder)
             }
         }
     }
