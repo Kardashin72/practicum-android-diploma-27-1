@@ -206,7 +206,7 @@ fun SearchIndustryFilterScreen(
                                 shape = RoundedCornerShape(8.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = blue, // Цвет фона кнопки
-                                    contentColor = white    // Цвет текста на кнопке
+                                    contentColor = white // Цвет текста на кнопке
                                 )
                             ) {
                                 Text(
