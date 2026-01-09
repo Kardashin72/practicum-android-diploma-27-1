@@ -88,9 +88,6 @@ class SearchIndustryFilterViewModel(
             } catch (e: NoSuchElementException) {
                 _errorMessage.value = "Неизвестная ошибка"
                 e.printStackTrace()
-            } catch (e: RuntimeException) {
-                _errorMessage.value = "Неизвестная ошибка"
-                e.printStackTrace()
             } finally {
                 _isLoadingIndustries.value = false
             }
