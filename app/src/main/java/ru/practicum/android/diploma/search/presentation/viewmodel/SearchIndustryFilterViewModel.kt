@@ -17,6 +17,10 @@ class SearchIndustryFilterViewModel(
     private val interactor: SearchInteractor,
 ) : ViewModel() {
 
+    companion object {
+        private const val STOP_TIMEOUT_MILLIS = 5_000L
+    }
+
     private val _industries = MutableStateFlow<List<FilterIndustry>>(emptyList())
     val industries: StateFlow<List<FilterIndustry>> = _industries.asStateFlow()
 
@@ -54,7 +58,7 @@ class SearchIndustryFilterViewModel(
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
         initialValue = emptyList()
     )
 
