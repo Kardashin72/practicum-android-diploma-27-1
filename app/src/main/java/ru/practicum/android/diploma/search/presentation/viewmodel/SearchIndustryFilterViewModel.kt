@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import ru.practicum.android.diploma.search.domain.api.SearchInteractor
 import ru.practicum.android.diploma.search.domain.model.FilterIndustry
 
@@ -82,7 +83,12 @@ class SearchIndustryFilterViewModel(
                         _errorMessage.value = result.message
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: NoSuchElementException) {
+                _errorMessage.value = "Неизвестная ошибка"
+                e.printStackTrace()
+            } catch (e: RuntimeException) {
                 _errorMessage.value = "Неизвестная ошибка"
                 e.printStackTrace()
             } finally {
@@ -90,10 +96,6 @@ class SearchIndustryFilterViewModel(
             }
         }
     }
-
-//    fun retryLoadIndustries() {
-//        loadIndustries()
-//    }
 
     fun onIndustryClick(industryId: Int) {
         onIndustrySelected(industryId)
