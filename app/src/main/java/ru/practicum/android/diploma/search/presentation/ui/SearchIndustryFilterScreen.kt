@@ -141,7 +141,7 @@ fun SearchIndustryFilterScreen(
                             R.string.error_server
 
                         else ->
-                            R.string.get_vacancies_error
+                            R.string.get_industries_error
                     }
                     PlaceHolder(
                         drawableId,
