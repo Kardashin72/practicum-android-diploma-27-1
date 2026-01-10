@@ -67,7 +67,7 @@ class SearchViewModel(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
             initialValue = false
         )
 
@@ -245,5 +245,6 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val SUBSCRIBE_TIMEOUT = 5_000L
     }
 }
