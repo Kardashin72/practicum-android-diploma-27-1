@@ -41,4 +41,8 @@
     <string name="filter_hide_without_salary" translatable="false">Не показывать без зарплаты</string>
     <string name="filter_apply" translatable="false">Применить</string>
     <string name="filter_reset" translatable="false">Сбросить</string>
+    <string name="select" translatable="false">Выбрать</string>
+    <string name="industry_search_hint">Введите отрасль</string>
+    <string name="industry_not_found" translatable="false">Такой отрасли нет</string>
+    <string name="get_industries_error" translatable="false">Не удалось получить список отраслей</string>
 </resources>
