@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.Loading
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
@@ -112,26 +113,39 @@ fun SearchScreen(
             when (searchState) {
                 is SearchState.Content -> {
                     val data = (searchState as SearchState.Content).data
-                    if (textFieldState.isShowClearIc) {
-                        SearchResultBanner(
-                            foundVacancies = foundVacancies,
-                            isEmptyResult = data.isEmpty()
-                        )
-                    }
                     if (data.isEmpty()) {
                         if (textFieldState.isShowClearIc) {
+                            SearchResultBanner(
+                                foundVacancies = foundVacancies,
+                                isEmptyResult = data.isEmpty()
+                            )
                             PlaceHolder(
                                 placeholderImage = R.drawable.get_items_error_placeholder,
                                 placeholderText = R.string.get_vacancies_error,
                             )
                         }
                     } else {
-                        VacanciesList(
-                            data,
-                            onVacancyClick = onOpenVacancyDetails,
-                            onLoadNextPage = viewModel::onLoadNextPage,
-                            isLoading = (searchState as SearchState.Content).isLoading,
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            VacanciesList(
+                                data,
+                                onVacancyClick = onOpenVacancyDetails,
+                                onLoadNextPage = viewModel::onLoadNextPage,
+                                isLoading = (searchState as SearchState.Content).isLoading,
+                            )
+                            if (textFieldState.isShowClearIc) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .align(Alignment.TopCenter)
+                                        .zIndex(1f)
+                                ) {
+                                    SearchResultBanner(
+                                        foundVacancies = foundVacancies,
+                                        isEmptyResult = data.isEmpty()
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -192,19 +206,19 @@ private fun SearchResultBanner(
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dp16),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             color = MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(corner12)
+            shape = RoundedCornerShape(corner12),
+//            modifier = Modifier.padding(horizontal = dp16)
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             )
         }
     }
