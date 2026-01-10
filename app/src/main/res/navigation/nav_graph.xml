@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_searchFragment2_to_searchFiltersFragment2"
             app:destination="@id/searchFiltersFragment" />
+        <action
+            android:id="@+id/action_menu_main_to_vacancyDetailsFragment"
+            app:destination="@id/vacancyDetailsFragment" />
     </fragment>
 
     <fragment
@@ -44,5 +47,18 @@
     <fragment
         android:id="@+id/vacancyDetailsFragment"
         android:name="ru.practicum.android.diploma.vacancy.details.presentation.ui.VacancyDetailsFragment"
-        android:label="VacancyDetailsFragment" />
+        android:label="VacancyDetailsFragment" >
+        <argument
+            android:name="vacancyId"
+            app:argType="string"
+            android:defaultValue="@null" />
+        <argument
+            android:name="openedFromFavorites"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="isFavorite"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </fragment>
 </navigation>
