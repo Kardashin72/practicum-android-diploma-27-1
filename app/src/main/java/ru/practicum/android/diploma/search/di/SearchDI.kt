@@ -43,7 +43,8 @@ val searchDataModule = module {
     single<SearchRepository> { SearchRepositoryImpl(get()) }
     single {
         androidContext().getSharedPreferences(
-            VacancyFilterStorageKeys.VACANCY_FILTER_STORAGE_PREFS, Context.MODE_PRIVATE
+            VacancyFilterStorageKeys.VACANCY_FILTER_STORAGE_PREFS,
+            Context.MODE_PRIVATE
         )
     }
     factory {
@@ -77,5 +78,7 @@ val searchPresentationModule = module {
 }
 
 val searchModules = listOf(
-    searchDataModule, searchDomainModule, searchPresentationModule
+    searchDataModule,
+    searchDomainModule,
+    searchPresentationModule
 )

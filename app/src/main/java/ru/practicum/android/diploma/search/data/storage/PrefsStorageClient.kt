@@ -14,7 +14,8 @@ class PrefsStorageClient<T>(
     override fun storeData(data: T) {
         prefs.edit {
             putString(
-                dataKey, gson.toJson(data)
+                dataKey,
+                gson.toJson(data)
             )
         }
     }

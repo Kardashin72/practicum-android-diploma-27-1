@@ -10,10 +10,13 @@ import ru.practicum.android.diploma.search.domain.model.VacancyFilter
 
 class SearchFiltersViewModel(private val interactor: VacancyFilterStorageInteractor) : ViewModel() {
 
-
     val filters: StateFlow<VacancyFilter> = interactor.getFilters().stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5_000), VacancyFilter()
+        SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
+        VacancyFilter()
     )
 
+    companion object {
+        private const val SUBSCRIBE_TIMEOUT = 5_000L
+    }
 }
