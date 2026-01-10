@@ -8,10 +8,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
+import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 
 class SearchFiltersFragment : Fragment() {
+    private val searchViewModel by activityViewModel<SearchViewModel>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -24,6 +28,7 @@ class SearchFiltersFragment : Fragment() {
                         SearchFiltersScreen(
                             onBack = { navigateBack() },
                             onOpenIndustryFilter = { openIndustryFilter() },
+                            onApply = { applyFiltersAndSearch() },
                         )
                     }
                 }
@@ -37,5 +42,13 @@ class SearchFiltersFragment : Fragment() {
 
     private fun navigateBack() {
         findNavController().navigateUp()
+    }
+
+    private fun applyFiltersAndSearch() {
+        val query = searchViewModel.textFieldState.value.query
+        if (query.isNotEmpty()) {
+            searchViewModel.restartSearchWithCurrentQuery()
+        }
+        navigateBack()
     }
 }

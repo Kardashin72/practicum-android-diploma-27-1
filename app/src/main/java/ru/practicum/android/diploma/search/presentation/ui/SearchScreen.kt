@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -53,6 +52,7 @@ fun SearchScreen(
     val searchState by viewModel.searchState.collectAsState()
     val foundVacancies by viewModel.foundVacancies.collectAsState()
     val paginationErrorMessage by viewModel.paginationErrorMessage.collectAsState()
+    val hasActiveFilters by viewModel.hasActiveFilters.collectAsState()
 
     val context = LocalContext.current
 
@@ -85,12 +85,17 @@ fun SearchScreen(
                     onClick = onOpenFilters,
                     modifier = Modifier
                         .padding(start = dp16, top = dp20, bottom = dp20, end = dp20)
-                        .size(24.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.filter_off__24px),
+                        painter = painterResource(
+                            if (hasActiveFilters) {
+                                R.drawable.ic_filter_active_24px
+                            } else {
+                                R.drawable.filter_off__24px
+                            }
+                        ),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = Color.Unspecified
                     )
                 }
             })

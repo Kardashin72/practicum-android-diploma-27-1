@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,11 +54,18 @@ import ru.practicum.android.diploma.search.presentation.viewmodel.SearchFiltersV
 fun SearchFiltersScreen(
     onOpenIndustryFilter: () -> Unit,
     onBack: () -> Unit,
+    onApply: () -> Unit,
     viewModel: SearchFiltersViewModel = koinViewModel(),
 ) {
     var salaryInput by rememberSaveable { mutableStateOf("") }
     val filters by viewModel.filters.collectAsState()
     val hideWithoutSalary = filters.onlyWithSalary == true
+
+    LaunchedEffect(filters.salary) {
+        if (salaryInput.isEmpty() && filters.salary != null) {
+            salaryInput = filters.salary.toString()
+        }
+    }
 
     val hasActiveFilters =
         filters.salary != null ||
@@ -98,7 +106,9 @@ fun SearchFiltersScreen(
             ) {
                 FilterRow(
                     title = stringResource(id = R.string.filter_industry),
-                    onClick = onOpenIndustryFilter
+                    value = filters.industryName,
+                    onClick = onOpenIndustryFilter,
+                    onClear = { viewModel.clearIndustry() }
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -149,7 +159,7 @@ fun SearchFiltersScreen(
                         Button(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(corner12),
-                            onClick = onBack
+                            onClick = onApply
                         ) {
                             Text(text = stringResource(id = R.string.filter_apply))
                         }
@@ -176,7 +186,9 @@ fun SearchFiltersScreen(
 @Composable
 private fun FilterRow(
     title: String,
+    value: String?,
     onClick: () -> Unit,
+    onClear: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -185,17 +197,42 @@ private fun FilterRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        val titleColor =
+            if (value != null) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = titleColor
+            )
+            if (value != null) {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
         IconButton(
-            onClick = onClick,
+            onClick = if (value != null && onClear != null) onClear else onClick,
             modifier = Modifier.size(24.dp)
         ) {
+            val iconRes =
+                if (value != null && onClear != null) {
+                    R.drawable.close_24px
+                } else {
+                    R.drawable.ic__arrow_forward_24px
+                }
+
             Icon(
-                painter = painterResource(R.drawable.ic__arrow_forward_24px),
+                painter = painterResource(iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -256,14 +293,19 @@ private fun SalaryField(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (value.isEmpty()) {
-                            Text(
-                                text = stringResource(id = R.string.filter_expected_salary_hint),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.outline
-                            )
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (value.isEmpty()) {
+                                Text(
+                                    text = stringResource(id = R.string.filter_expected_salary_hint),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.outline
+                                )
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
                     }
                 }
 

@@ -3,8 +3,12 @@ package ru.practicum.android.diploma.search.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.core.presentation.ui.model.VacancyListItemUi
@@ -12,6 +16,7 @@ import ru.practicum.android.diploma.core.presentation.ui.util.debounce
 import ru.practicum.android.diploma.core.presentation.ui.util.formatSalary
 import ru.practicum.android.diploma.favorites.vacancies.domain.api.FavoritesVacanciesInteractor
 import ru.practicum.android.diploma.search.domain.api.SearchInteractor
+import ru.practicum.android.diploma.search.domain.api.VacancyFilterStorageInteractor
 import ru.practicum.android.diploma.search.domain.model.Result
 import ru.practicum.android.diploma.search.domain.model.VacancyDetail
 import ru.practicum.android.diploma.search.domain.model.VacancyFilter
@@ -19,7 +24,8 @@ import ru.practicum.android.diploma.search.domain.model.VacancyResponse
 
 class SearchViewModel(
     private val interactor: SearchInteractor,
-    private val favoritesInteractor: FavoritesVacanciesInteractor
+    private val favoritesInteractor: FavoritesVacanciesInteractor,
+    private val vacancyFilterStorageInteractor: VacancyFilterStorageInteractor
 ) : ViewModel() {
     private val _vacancies = MutableStateFlow<List<VacancyDetail>>(emptyList())
     val vacancies: StateFlow<List<VacancyDetail>> = _vacancies
@@ -43,9 +49,23 @@ class SearchViewModel(
 
     private val _textFieldState = MutableStateFlow(SearchTextFieldState())
     val textFieldState = _textFieldState.asStateFlow()
+
     val searchVacanciesDebounce = debounce<String>(SEARCH_DEBOUNCE_DELAY, viewModelScope, true) {
         searchVacancies()
     }
+
+    val hasActiveFilters: StateFlow<Boolean> = vacancyFilterStorageInteractor
+        .getFilters()
+        .map { filters ->
+            filters.salary != null ||
+                filters.onlyWithSalary == true ||
+                filters.industry != null
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
 
     init {
         observeFavorites()
@@ -67,20 +87,32 @@ class SearchViewModel(
         if (newSearchText.isNotEmpty()) {
             renderSearchState(SearchState.Loading)
             viewModelScope.launch {
-                interactor.getVacancies(VacancyFilter(text = newSearchText, page = currentPage)).collect { result ->
+                val filter = buildVacancyFilter(page = currentPage)
+                interactor.getVacancies(filter).collect { result ->
                     when (result) {
-                        is Result.Error -> processResult(errorMessage = result.message)
+                        is Result.Error -> {
+                            renderSearchState(SearchState.Content(vacanciesList, false))
+                            _paginationErrorMessage.value = result.message
+                        }
                         is Result.Success<VacancyResponse> -> {
                             processResult(result.data)
-                            maxPages = result.data.pages
-                            _foundVacancies.update {
-                                result.data.found
-                            }
+                            renderSearchState(SearchState.Content(vacanciesList, false))
                         }
                     }
                 }
             }
         }
+    }
+
+    fun restartSearchWithCurrentQuery() {
+        removeSearchList()
+        searchVacancies()
+    }
+
+    private suspend fun buildVacancyFilter(page: Int): VacancyFilter {
+        val queryText = _textFieldState.value.query
+        val savedFilters = vacancyFilterStorageInteractor.getFilters().first()
+        return savedFilters.copy(text = queryText, page = page)
     }
 
     fun searchDebounce(changedText: String) {
@@ -110,19 +142,19 @@ class SearchViewModel(
         if (currentPage <= maxPages) {
             currentPage++
             viewModelScope.launch {
-                interactor.getVacancies(VacancyFilter(text = _textFieldState.value.query, page = currentPage))
-                    .collect { result ->
-                        when (result) {
-                            is Result.Error -> {
-                                renderSearchState(SearchState.Content(vacanciesList, false))
-                                _paginationErrorMessage.value = result.message
-                            }
-                            is Result.Success<VacancyResponse> -> {
-                                processResult(result.data)
-                                renderSearchState(SearchState.Content(vacanciesList, false))
-                            }
+                val filter = buildVacancyFilter(page = currentPage)
+                interactor.getVacancies(filter).collect { result ->
+                    when (result) {
+                        is Result.Error -> {
+                            renderSearchState(SearchState.Content(vacanciesList, false))
+                            _paginationErrorMessage.value = result.message
+                        }
+                        is Result.Success<VacancyResponse> -> {
+                            processResult(result.data)
+                            renderSearchState(SearchState.Content(vacanciesList, false))
                         }
                     }
+                }
             }
         }
     }

@@ -72,7 +72,7 @@ val searchDomainModule = module {
 }
 
 val searchPresentationModule = module {
-    viewModel { SearchViewModel(get(), get()) }
+    viewModel { SearchViewModel(get(), get(), get()) }
     viewModel { SearchFiltersViewModel(get()) }
     viewModel { SearchIndustryFilterViewModel(get()) }
 }

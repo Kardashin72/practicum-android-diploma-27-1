@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
+import ru.practicum.android.diploma.search.domain.model.FilterIndustry
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchFiltersViewModel
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchIndustryFilterViewModel
 
@@ -42,8 +43,8 @@ class SearchIndustryFilterFragment : Fragment() {
         }
     }
 
-    private fun onIndustrySelected(industry: ru.practicum.android.diploma.search.domain.model.FilterIndustry) {
-//        filtersViewModel.onIndustrySelected(industry)
+    private fun onIndustrySelected(industry: FilterIndustry) {
+        filtersViewModel.onIndustrySelected(industry)
     }
 
     private fun navigateBack() {

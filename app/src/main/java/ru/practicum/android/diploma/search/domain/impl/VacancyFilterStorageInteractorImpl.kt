@@ -18,7 +18,7 @@ class VacancyFilterStorageInteractorImpl(val repository: VacancyFilterStorageRep
         repository.saveFilters(filters)
     }
 
-    override suspend fun clearFilters(filters: VacancyFilter) {
-        repository.clearFilters(filters)
+    override suspend fun clearFilters() {
+        repository.clearFilters()
     }
 }
