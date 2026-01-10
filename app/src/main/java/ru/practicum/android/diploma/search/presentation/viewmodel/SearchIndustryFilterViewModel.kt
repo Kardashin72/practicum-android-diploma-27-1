@@ -19,7 +19,7 @@ class SearchIndustryFilterViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val STOP_TIMEOUT_MILLIS = 5_000L
+        private const val SUBSCRIBE_TIMEOUT = 5_000L
     }
 
     private val _industries = MutableStateFlow<List<FilterIndustry>>(emptyList())
@@ -59,7 +59,7 @@ class SearchIndustryFilterViewModel(
         }
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
         initialValue = emptyList()
     )
 
