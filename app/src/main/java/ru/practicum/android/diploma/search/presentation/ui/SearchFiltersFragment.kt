@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
 
 class SearchFiltersFragment : Fragment() {
     override fun onCreateView(
@@ -18,11 +19,13 @@ class SearchFiltersFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme {
-                    SearchFiltersScreen(
-                        onBack = { navigateBack() },
-                        onOpenIndustryFilter = { openIndustryFilter() },
-                    )
+                VacancySearchAppTheme {
+                    MaterialTheme {
+                        SearchFiltersScreen(
+                            onBack = { navigateBack() },
+                            onOpenIndustryFilter = { openIndustryFilter() },
+                        )
+                    }
                 }
             }
         }

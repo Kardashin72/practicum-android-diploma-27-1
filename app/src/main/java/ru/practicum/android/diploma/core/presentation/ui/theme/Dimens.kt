@@ -9,6 +9,7 @@ val dp4 = 4.dp
 val dp8 = 8.dp
 val dp12 = 12.dp
 val dp16 = 16.dp
+val dp17 = 17.dp
 val dp19 = 19.dp
 val dp20 = 20.dp
 val dp24 = 24.dp
