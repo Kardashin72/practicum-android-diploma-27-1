@@ -1,14 +1,19 @@
 package ru.practicum.android.diploma.search.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import ru.practicum.android.diploma.search.domain.api.SearchInteractor
+import kotlinx.coroutines.flow.stateIn
+import ru.practicum.android.diploma.search.domain.api.VacancyFilterStorageInteractor
 import ru.practicum.android.diploma.search.domain.model.VacancyFilter
 
-class SearchFiltersViewModel(private val interactor: SearchInteractor) : ViewModel() {
+class SearchFiltersViewModel(private val interactor: VacancyFilterStorageInteractor) : ViewModel() {
 
-    private val _filters = MutableStateFlow(VacancyFilter())
-    val filters: StateFlow<VacancyFilter> = _filters
+
+    val filters: StateFlow<VacancyFilter> = interactor.getFilters().stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000), VacancyFilter()
+    )
 
 }
