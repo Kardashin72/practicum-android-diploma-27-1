@@ -212,7 +212,6 @@ private fun SearchResultBanner(
         Surface(
             color = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(corner12),
-//            modifier = Modifier.padding(horizontal = dp16)
         ) {
             Text(
                 text = text,
