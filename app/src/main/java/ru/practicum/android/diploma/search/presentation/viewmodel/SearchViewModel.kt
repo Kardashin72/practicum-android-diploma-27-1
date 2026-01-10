@@ -139,7 +139,7 @@ class SearchViewModel(
 
     fun onLoadNextPage() {
         renderSearchState(SearchState.Content(vacanciesList, true))
-        if (currentPage <= maxPages) {
+        if (currentPage < maxPages) {
             currentPage++
             viewModelScope.launch {
                 val filter = buildVacancyFilter(page = currentPage)
@@ -168,6 +168,7 @@ class SearchViewModel(
         errorMessage: String = ""
     ) {
         currentPage = vacancyResponse.page
+        maxPages = (vacancyResponse.pages - 1).coerceAtLeast(0)
         if (errorMessage.isEmpty()) {
             _foundVacancies.value = vacancyResponse.found
         }
