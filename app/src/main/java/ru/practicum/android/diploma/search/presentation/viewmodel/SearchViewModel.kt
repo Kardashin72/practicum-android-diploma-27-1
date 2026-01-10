@@ -2,6 +2,7 @@ package ru.practicum.android.diploma.search.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -54,6 +55,9 @@ class SearchViewModel(
         searchVacancies()
     }
 
+    private var onLoadNextPageJob: Job? = null
+    private var searchJob: Job? = null
+
     val hasActiveFilters: StateFlow<Boolean> = vacancyFilterStorageInteractor
         .getFilters()
         .map { filters ->
@@ -84,24 +88,28 @@ class SearchViewModel(
 
     fun searchVacancies() {
         val newSearchText = textFieldState.value.query
-        if (newSearchText.isNotEmpty()) {
-            renderSearchState(SearchState.Loading)
-            viewModelScope.launch {
-                val filter = buildVacancyFilter(page = currentPage)
-                interactor.getVacancies(filter).collect { result ->
-                    when (result) {
-                        is Result.Error -> {
-                            renderSearchState(SearchState.Content(vacanciesList, false))
-                            _paginationErrorMessage.value = result.message
-                        }
-                        is Result.Success<VacancyResponse> -> {
-                            processResult(result.data)
-                            renderSearchState(SearchState.Content(vacanciesList, false))
-                        }
+        if (newSearchText.isEmpty()) {
+            return
+        }
+        searchJob?.cancel()
+        renderSearchState(SearchState.Loading)
+        searchJob = viewModelScope.launch {
+            val filter = buildVacancyFilter(page = currentPage)
+            interactor.getVacancies(filter).collect { result ->
+                when (result) {
+                    is Result.Error -> {
+                        renderSearchState(SearchState.Content(vacanciesList, false))
+                        _paginationErrorMessage.value = result.message
+                    }
+
+                    is Result.Success<VacancyResponse> -> {
+                        processResult(result.data)
+                        renderSearchState(SearchState.Content(vacanciesList, false))
                     }
                 }
             }
         }
+
     }
 
     fun restartSearchWithCurrentQuery() {
@@ -133,26 +141,31 @@ class SearchViewModel(
     }
 
     fun onClearIcClick() {
+        onLoadNextPageJob?.cancel()
+        searchJob?.cancel()
         onQueryChange("")
         removeSearchList()
     }
 
     fun onLoadNextPage() {
+        if (currentPage > maxPages) {
+            return
+        }
+        onLoadNextPageJob?.cancel()
         renderSearchState(SearchState.Content(vacanciesList, true))
-        if (currentPage < maxPages) {
-            currentPage++
-            viewModelScope.launch {
-                val filter = buildVacancyFilter(page = currentPage)
-                interactor.getVacancies(filter).collect { result ->
-                    when (result) {
-                        is Result.Error -> {
-                            renderSearchState(SearchState.Content(vacanciesList, false))
-                            _paginationErrorMessage.value = result.message
-                        }
-                        is Result.Success<VacancyResponse> -> {
-                            processResult(result.data)
-                            renderSearchState(SearchState.Content(vacanciesList, false))
-                        }
+        currentPage++
+        onLoadNextPageJob = viewModelScope.launch {
+            val filter = buildVacancyFilter(page = currentPage)
+            interactor.getVacancies(filter).collect { result ->
+                when (result) {
+                    is Result.Error -> {
+                        renderSearchState(SearchState.Content(vacanciesList, false))
+                        _paginationErrorMessage.value = result.message
+                    }
+
+                    is Result.Success<VacancyResponse> -> {
+                        processResult(result.data)
+                        renderSearchState(SearchState.Content(vacanciesList, false))
                     }
                 }
             }
@@ -206,8 +219,8 @@ class SearchViewModel(
     }
 
     private fun removeSearchList() {
-        vacanciesList.clear()
         renderSearchState(SearchState.Nothing)
+        vacanciesList.clear()
         currentPage = 0
         _foundVacancies.value = 0
     }
