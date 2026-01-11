@@ -24,7 +24,7 @@ class SearchFiltersFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 VacancySearchAppTheme {
-                    MaterialTheme {
+                    MaterialTheme {//нужно менять
                         SearchFiltersScreen(
                             onBack = { navigateBack() },
                             onOpenIndustryFilter = { openIndustryFilter() },
