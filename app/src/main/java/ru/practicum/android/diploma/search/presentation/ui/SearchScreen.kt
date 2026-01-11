@@ -37,8 +37,12 @@ import ru.practicum.android.diploma.core.presentation.ui.components.Loading
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
 import ru.practicum.android.diploma.core.presentation.ui.components.VacanciesList
 import ru.practicum.android.diploma.core.presentation.ui.theme.corner12
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp12
 import ru.practicum.android.diploma.core.presentation.ui.theme.dp16
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp2
 import ru.practicum.android.diploma.core.presentation.ui.theme.dp20
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp4
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp8
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchState
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 
@@ -78,7 +82,7 @@ fun SearchScreen(
                     text = stringResource(R.string.title_search),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 19.dp),
+                    modifier = Modifier.padding(horizontal = dp4, vertical = 19.dp),
                     maxLines = 1,
                 )
             }, actions = {
@@ -137,7 +141,7 @@ fun SearchScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .align(Alignment.TopCenter)
-                                        .padding(top = 12.dp)
+                                        .padding(top = dp12)
                                         .zIndex(1f)
                                 ) {
                                     SearchResultBanner(
@@ -218,7 +222,7 @@ private fun SearchResultBanner(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.padding(horizontal = dp12, vertical = dp4),
             )
         }
     }
@@ -234,8 +238,7 @@ private fun SearchInput(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-//            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = dp16, top = dp8, end = dp16)
     ) {
         Box {
             TextField(
@@ -252,7 +255,7 @@ private fun SearchInput(
                     Text(
                         text = stringResource(R.string.search_textField_hint),
                         color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.padding(start = 2.dp)
+                        modifier = Modifier.padding(start = dp2)
                     )
                 },
                 trailingIcon = {
@@ -276,7 +279,7 @@ private fun SearchInput(
                         )
                     }
                 },
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(dp8),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
