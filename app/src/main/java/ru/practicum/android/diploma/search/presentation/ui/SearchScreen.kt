@@ -131,7 +131,8 @@ fun SearchScreen(
                         if (textFieldState.isShowClearIc) {
                             SearchResultBanner(
                                 foundVacancies = foundVacancies,
-                                isEmptyResult = data.isEmpty()
+                                isEmptyResult = data.isEmpty(),
+                                modifier = Modifier.padding(top = dp12)
                             )
                             PlaceHolder(
                                 placeholderImage = R.drawable.get_items_error_placeholder,
@@ -212,6 +213,7 @@ fun SearchScreen(
 private fun SearchResultBanner(
     foundVacancies: Int,
     isEmptyResult: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val text = if (isEmptyResult) {
         stringResource(id = R.string.search_nothing_found)
@@ -220,7 +222,7 @@ private fun SearchResultBanner(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
