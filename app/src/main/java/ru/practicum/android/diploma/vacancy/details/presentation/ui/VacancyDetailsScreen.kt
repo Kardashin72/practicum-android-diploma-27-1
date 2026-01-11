@@ -67,7 +67,8 @@ fun VacancyDetailsScreen(
                     IconButton(onClick = onShare) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = null
+                            contentDescription = null,
+                            tint = black
                         )
                     }
                     IconButton(onClick = onFavoriteClick) {
