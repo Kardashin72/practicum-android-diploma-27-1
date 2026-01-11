@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.core.presentation.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -14,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.core.presentation.ui.model.VacancyListItemUi
 import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
@@ -26,6 +28,7 @@ fun VacanciesList(
     onVacancyClick: (String) -> Unit,
     onLoadNextPage: () -> Unit = {},
     isLoading: Boolean = false,
+    topPadding: Dp = 32.dp,
 ) {
     val listState = rememberLazyListState()
 
@@ -49,6 +52,7 @@ fun VacanciesList(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = topPadding),
         ) {
             items(
                 items = vacancies,
