@@ -137,6 +137,7 @@ fun SearchScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .align(Alignment.TopCenter)
+                                        .padding(top = 12.dp)
                                         .zIndex(1f)
                                 ) {
                                     SearchResultBanner(
@@ -233,7 +234,8 @@ private fun SearchInput(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+//            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Box {
             TextField(
