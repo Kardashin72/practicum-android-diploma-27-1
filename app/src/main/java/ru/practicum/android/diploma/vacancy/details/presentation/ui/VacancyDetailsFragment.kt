@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
 import ru.practicum.android.diploma.vacancy.details.domain.model.VacancyDetailsSource
 import ru.practicum.android.diploma.vacancy.details.presentation.viewmodel.VacancyDetailsViewModel
 
@@ -42,19 +43,20 @@ class VacancyDetailsFragment : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                val state by viewModel.state.collectAsState()
-
-                VacancyDetailsScreen(
-                    vacancy = state.vacancy,
-                    isFavorite = state.isFavorite,
-                    isLoading = state.isLoading,
-                    error = state.error,
-                    onBack = { navigateBack() },
-                    onShare = { shareVacancy() },
-                    onFavoriteClick = { viewModel.toggleFavorite() },
-                    onPhoneClick = { phone -> dialPhone(phone) },
-                    onEmailClick = { email -> sendEmail(email) }
-                )
+                VacancySearchAppTheme {
+                    val state by viewModel.state.collectAsState()
+                    VacancyDetailsScreen(
+                        vacancy = state.vacancy,
+                        isFavorite = state.isFavorite,
+                        isLoading = state.isLoading,
+                        error = state.error,
+                        onBack = { navigateBack() },
+                        onShare = { shareVacancy() },
+                        onFavoriteClick = { viewModel.toggleFavorite() },
+                        onPhoneClick = { phone -> dialPhone(phone) },
+                        onEmailClick = { email -> sendEmail(email) }
+                    )
+                }
             }
         }
     }
