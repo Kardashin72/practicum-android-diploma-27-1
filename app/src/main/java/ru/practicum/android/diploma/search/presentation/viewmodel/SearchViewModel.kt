@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.search.presentation.viewmodel
 
+import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -26,7 +27,8 @@ import ru.practicum.android.diploma.search.domain.model.VacancyResponse
 class SearchViewModel(
     private val interactor: SearchInteractor,
     private val favoritesInteractor: FavoritesVacanciesInteractor,
-    private val vacancyFilterStorageInteractor: VacancyFilterStorageInteractor
+    private val vacancyFilterStorageInteractor: VacancyFilterStorageInteractor,
+    private val resources: Resources,
 ) : ViewModel() {
     private val _vacancies = MutableStateFlow<List<VacancyDetail>>(emptyList())
     val vacancies: StateFlow<List<VacancyDetail>> = _vacancies
@@ -194,7 +196,7 @@ class SearchViewModel(
                     it.name,
                     it.address?.city,
                     it.employer.name,
-                    formatSalary(it.salary?.from, it.salary?.to, it.salary?.currency),
+                    formatSalary(it.salary?.from, it.salary?.to, it.salary?.currency, resources),
                     currentFavoriteIds.contains(it.id)
                 )
             })

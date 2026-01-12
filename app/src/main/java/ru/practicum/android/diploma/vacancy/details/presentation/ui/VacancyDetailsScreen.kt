@@ -20,7 +20,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -219,7 +221,8 @@ private fun VacancyTitle(name: String) {
 
 @Composable
 private fun VacancySalary(salary: Salary) {
-    val formattedSalary = salary.format() ?: stringResource(R.string.salary_not_specified)
+    val resources = LocalContext.current.resources
+    val formattedSalary = salary.format(resources) ?: stringResource(R.string.salary_not_specified)
     Text(
         text = formattedSalary,
         style = CustomTypography.headlineMedium
@@ -281,6 +284,8 @@ private fun VacancyDescription(description: String) {
 
 @Composable
 private fun VacancySkills(skills: List<String>) {
+    val dot = stringResource(R.string.dot)
+
     Column {
         Text(
             text = stringResource(R.string.vacancy_details_skills),
@@ -288,8 +293,9 @@ private fun VacancySkills(skills: List<String>) {
         )
         if (skills.size > 1) {
             skills.forEach { skill ->
+                val skillText = remember(dot, skill) { "$dot $skill" }
                 Text(
-                    text = "${stringResource(R.string.dot)} $skill",
+                    text = skillText,
                     style = CustomTypography.bodyMedium
                 )
             }

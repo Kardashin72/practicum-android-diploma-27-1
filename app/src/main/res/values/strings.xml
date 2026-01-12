@@ -45,4 +45,7 @@
     <string name="industry_search_hint">Введите отрасль</string>
     <string name="industry_not_found" translatable="false">Такой отрасли нет</string>
     <string name="get_industries_error" translatable="false">Не удалось получить список отраслей</string>
+    <string name="salary_from_to" translatable="false">От %1$s до %2$s %3$s</string>
+    <string name="salary_from" translatable="false">От %1$s %2$s</string>
+    <string name="salary_to" translatable="false">До %1$s %2$s</string>
 </resources>
