@@ -43,9 +43,9 @@ fun VacanciesList(
         }
     }
 
-    LaunchedEffect(shouldLoadNext.value && !isLoading) {
+    LaunchedEffect(shouldLoadNext.value) {
         if (shouldLoadNext.value && !isLoading) {
-        onLoadNextPage()
+            onLoadNextPage()
         }
     }
 
