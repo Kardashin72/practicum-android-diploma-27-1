@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
@@ -67,6 +68,7 @@ fun FavoritesVacanciesScreen(
                     VacanciesList(
                         vacancies = vacancies,
                         onVacancyClick = onOpenVacancyDetails,
+                        topPadding = 0.dp
                     )
                 }
             }
