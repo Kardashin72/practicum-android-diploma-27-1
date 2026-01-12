@@ -72,7 +72,7 @@ val searchDomainModule = module {
 }
 
 val searchPresentationModule = module {
-    viewModel { SearchViewModel(get(), get(), get()) }
+    viewModel { SearchViewModel(get(), get(), get(), androidContext().resources) }
     viewModel { SearchFiltersViewModel(get()) }
     viewModel { SearchIndustryFilterViewModel(get()) }
 }

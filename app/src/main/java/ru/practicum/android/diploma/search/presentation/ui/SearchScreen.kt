@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.Loading
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
@@ -53,7 +55,7 @@ import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewMode
 fun SearchScreen(
     onOpenVacancyDetails: (String) -> Unit,
     onOpenFilters: () -> Unit,
-    viewModel: SearchViewModel,
+    viewModel: SearchViewModel = koinViewModel(),
 ) {
     val textFieldState by viewModel.textFieldState.collectAsState()
     val searchState by viewModel.searchState.collectAsState()
@@ -121,6 +123,7 @@ fun SearchScreen(
                 textFieldState.query,
                 textFieldState.isShowClearIc,
                 onQueryChange = viewModel::onQueryChange,
+                onSearch = viewModel::restartSearchWithCurrentQuery,
                 onClearIcClick = viewModel::onClearIcClick,
             )
 
@@ -246,6 +249,7 @@ private fun SearchInput(
     showClearIc: Boolean,
     onClearIcClick: () -> Unit,
     onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -262,6 +266,9 @@ private fun SearchInput(
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSearch() }
                 ),
                 placeholder = {
                     Text(

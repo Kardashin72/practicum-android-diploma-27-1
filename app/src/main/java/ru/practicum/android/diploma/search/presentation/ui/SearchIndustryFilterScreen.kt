@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.Loading
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
@@ -59,7 +60,7 @@ fun SearchIndustryFilterScreen(
     onBack: () -> Unit,
     onIndustrySelected: (FilterIndustry) -> Unit = {},
     selectedIndustryId: Int? = null,
-    viewModel: SearchIndustryFilterViewModel,
+    viewModel: SearchIndustryFilterViewModel = koinViewModel(),
 ) {
     val industries by viewModel.industries.collectAsState()
     val isLoading by viewModel.isLoadingIndustries.collectAsState()

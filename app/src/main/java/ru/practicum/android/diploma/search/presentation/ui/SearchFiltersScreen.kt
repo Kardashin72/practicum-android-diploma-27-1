@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.search.presentation.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -190,20 +191,22 @@ private fun FilterRow(
     onClick: () -> Unit,
     onClear: (() -> Unit)? = null,
 ) {
+    val hasValue = !value.isNullOrEmpty()
+    val titleColor =
+        if (hasValue) {
+            MaterialTheme.colorScheme.onSurface
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val titleColor =
-            if (value != null) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            }
-
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -212,31 +215,44 @@ private fun FilterRow(
                 style = MaterialTheme.typography.bodyMedium,
                 color = titleColor
             )
-            if (value != null) {
+            if (hasValue) {
                 Text(
-                    text = value,
+                    text = value.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
-        IconButton(
-            onClick = if (value != null && onClear != null) onClear else onClick,
-            modifier = Modifier.size(24.dp)
-        ) {
-            val iconRes =
-                if (value != null && onClear != null) {
-                    R.drawable.close_24px
-                } else {
-                    R.drawable.ic__arrow_forward_24px
-                }
+        FilterRowIcon(
+            hasValue = hasValue,
+            onClick = onClick,
+            onClear = onClear,
+        )
+    }
+}
 
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+@Composable
+private fun FilterRowIcon(
+    hasValue: Boolean,
+    onClick: () -> Unit,
+    onClear: (() -> Unit)?,
+) {
+    val (iconRes, clickHandler) =
+        if (hasValue && onClear != null) {
+            R.drawable.close_24px to onClear
+        } else {
+            R.drawable.ic__arrow_forward_24px to onClick
         }
+
+    IconButton(
+        onClick = clickHandler,
+        modifier = Modifier.size(24.dp)
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
