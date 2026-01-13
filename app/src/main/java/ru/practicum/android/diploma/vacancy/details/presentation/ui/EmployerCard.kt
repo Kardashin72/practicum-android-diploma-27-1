@@ -87,9 +87,10 @@ fun EmployerCard(vacancy: VacancyDetail) {
                 style = CustomTypography.headlineMedium
             )
 
-            if (vacancy.address?.city != null) {
+            val locationText = vacancy.address?.city ?: vacancy.area.name
+            if (locationText.isNotBlank()) {
                 Text(
-                    text = vacancy.address.city,
+                    text = locationText,
                     color = MaterialTheme.colorScheme.onBackground,
                     style = CustomTypography.titleMedium
                 )

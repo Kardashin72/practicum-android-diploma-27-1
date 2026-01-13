@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,24 +21,32 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.Loading
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
 import ru.practicum.android.diploma.core.presentation.ui.components.VacanciesList
 import ru.practicum.android.diploma.core.presentation.ui.theme.corner12
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp12
 import ru.practicum.android.diploma.core.presentation.ui.theme.dp16
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp2
 import ru.practicum.android.diploma.core.presentation.ui.theme.dp20
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp4
+import ru.practicum.android.diploma.core.presentation.ui.theme.dp8
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchState
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 
@@ -47,14 +55,23 @@ import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewMode
 fun SearchScreen(
     onOpenVacancyDetails: (String) -> Unit,
     onOpenFilters: () -> Unit,
-    viewModel: SearchViewModel,
+    viewModel: SearchViewModel = koinViewModel(),
 ) {
     val textFieldState by viewModel.textFieldState.collectAsState()
     val searchState by viewModel.searchState.collectAsState()
     val foundVacancies by viewModel.foundVacancies.collectAsState()
     val paginationErrorMessage by viewModel.paginationErrorMessage.collectAsState()
+    val hasActiveFilters by viewModel.hasActiveFilters.collectAsState()
 
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Скрываю клавиатуру при получении результатов поиска
+    LaunchedEffect(searchState) {
+        if (searchState is SearchState.Content) {
+            keyboardController?.hide()
+        }
+    }
 
     if (paginationErrorMessage != null) {
         val toastText = when (paginationErrorMessage) {
@@ -77,7 +94,7 @@ fun SearchScreen(
                     text = stringResource(R.string.title_search),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 19.dp),
+                    modifier = Modifier.padding(horizontal = dp4, vertical = 19.dp),
                     maxLines = 1,
                 )
             }, actions = {
@@ -85,12 +102,17 @@ fun SearchScreen(
                     onClick = onOpenFilters,
                     modifier = Modifier
                         .padding(start = dp16, top = dp20, bottom = dp20, end = dp20)
-                        .size(24.dp)
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.filter_off__24px),
+                        painter = painterResource(
+                            if (hasActiveFilters) {
+                                R.drawable.ic_filter_active_24px
+                            } else {
+                                R.drawable.filter_off__24px
+                            }
+                        ),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = Color.Unspecified
                     )
                 }
             })
@@ -101,32 +123,48 @@ fun SearchScreen(
                 textFieldState.query,
                 textFieldState.isShowClearIc,
                 onQueryChange = viewModel::onQueryChange,
+                onSearch = viewModel::restartSearchWithCurrentQuery,
                 onClearIcClick = viewModel::onClearIcClick,
             )
 
             when (searchState) {
                 is SearchState.Content -> {
                     val data = (searchState as SearchState.Content).data
-                    if (textFieldState.isShowClearIc) {
-                        SearchResultBanner(
-                            foundVacancies = foundVacancies,
-                            isEmptyResult = data.isEmpty()
-                        )
-                    }
                     if (data.isEmpty()) {
                         if (textFieldState.isShowClearIc) {
+                            SearchResultBanner(
+                                foundVacancies = foundVacancies,
+                                isEmptyResult = data.isEmpty(),
+                                modifier = Modifier.padding(top = dp12)
+                            )
                             PlaceHolder(
                                 placeholderImage = R.drawable.get_items_error_placeholder,
                                 placeholderText = R.string.get_vacancies_error,
                             )
                         }
                     } else {
-                        VacanciesList(
-                            data,
-                            onVacancyClick = onOpenVacancyDetails,
-                            onLoadNextPage = viewModel::onLoadNextPage,
-                            isLoading = (searchState as SearchState.Content).isLoading,
-                        )
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            VacanciesList(
+                                data,
+                                onVacancyClick = onOpenVacancyDetails,
+                                onLoadNextPage = viewModel::onLoadNextPage,
+                                isLoading = (searchState as SearchState.Content).isLoading,
+                            )
+                            if (textFieldState.isShowClearIc) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = dp12)
+                                        .zIndex(1f)
+                                ) {
+                                    SearchResultBanner(
+                                        foundVacancies = foundVacancies,
+                                        isEmptyResult = data.isEmpty()
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -178,6 +216,7 @@ fun SearchScreen(
 private fun SearchResultBanner(
     foundVacancies: Int,
     isEmptyResult: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val text = if (isEmptyResult) {
         stringResource(id = R.string.search_nothing_found)
@@ -186,20 +225,19 @@ private fun SearchResultBanner(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = dp16),
+        modifier = modifier
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             color = MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(corner12)
+            shape = RoundedCornerShape(corner12),
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(horizontal = dp12, vertical = dp4),
             )
         }
     }
@@ -211,11 +249,12 @@ private fun SearchInput(
     showClearIc: Boolean,
     onClearIcClick: () -> Unit,
     onQueryChange: (String) -> Unit,
+    onSearch: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = dp16, top = dp8, end = dp16)
     ) {
         Box {
             TextField(
@@ -228,11 +267,14 @@ private fun SearchInput(
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Done
                 ),
+                keyboardActions = KeyboardActions(
+                    onDone = { onSearch() }
+                ),
                 placeholder = {
                     Text(
                         text = stringResource(R.string.search_textField_hint),
                         color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.padding(start = 2.dp)
+                        modifier = Modifier.padding(start = dp2)
                     )
                 },
                 trailingIcon = {
@@ -256,7 +298,7 @@ private fun SearchInput(
                         )
                     }
                 },
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(dp8),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,

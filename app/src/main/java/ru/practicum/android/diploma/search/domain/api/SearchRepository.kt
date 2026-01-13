@@ -10,6 +10,7 @@ import ru.practicum.android.diploma.search.domain.model.VacancyFilter
 
 interface SearchRepository {
     fun getAreas(): Flow<Resource<List<FilterAreaDto>>>
+
     fun getIndustry(): Flow<Resource<List<FilterIndustryDto>>>
 
     fun getVacancies(

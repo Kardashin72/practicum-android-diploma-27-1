@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.core.presentation.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -13,7 +14,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.practicum.android.diploma.core.presentation.ui.model.VacancyListItemUi
 import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
@@ -26,6 +29,7 @@ fun VacanciesList(
     onVacancyClick: (String) -> Unit,
     onLoadNextPage: () -> Unit = {},
     isLoading: Boolean = false,
+    topPadding: Dp = 32.dp,
 ) {
     val listState = rememberLazyListState()
 
@@ -40,7 +44,7 @@ fun VacanciesList(
     }
 
     LaunchedEffect(shouldLoadNext.value) {
-        if (shouldLoadNext.value) {
+        if (shouldLoadNext.value && !isLoading) {
             onLoadNextPage()
         }
     }
@@ -49,6 +53,7 @@ fun VacanciesList(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(top = topPadding),
         ) {
             items(
                 items = vacancies,
@@ -83,6 +88,7 @@ fun VacanciesList(
 @Preview(showBackground = true)
 @Composable
 private fun VacanciesListPreview() {
+    val resources = LocalContext.current.resources
     val sampleVacancies = listOf(
         VacancyListItemUi(
             id = "1",
@@ -90,7 +96,7 @@ private fun VacanciesListPreview() {
             vacancyName = "Java-разработчик",
             city = "Омск",
             employer = "Авто.ру",
-            salary = formatSalary(2_000, 5_000, "EUR"),
+            salary = formatSalary(2_000, 5_000, "EUR", resources),
         ),
         VacancyListItemUi(
             id = "2",
@@ -98,7 +104,7 @@ private fun VacanciesListPreview() {
             vacancyName = "Android-разработчик",
             city = "Санкт-Петербург",
             employer = "Яндекс",
-            salary = formatSalary(null, 300_000, "RUB"),
+            salary = formatSalary(null, 300_000, "RUB", resources),
         ),
         VacancyListItemUi(
             id = "3",
@@ -106,7 +112,7 @@ private fun VacanciesListPreview() {
             vacancyName = "Курьер",
             city = "Москва",
             employer = "Яндекс-Еда",
-            salary = formatSalary(2_000, null, "USD"),
+            salary = formatSalary(2_000, null, "USD", resources),
         ),
         VacancyListItemUi(
             id = "4",
@@ -114,7 +120,7 @@ private fun VacanciesListPreview() {
             vacancyName = "Дантист",
             city = "Пермь",
             employer = "Ультра-Дент",
-            salary = formatSalary(null, null, null),
+            salary = formatSalary(null, null, null, resources),
         ),
     )
 
