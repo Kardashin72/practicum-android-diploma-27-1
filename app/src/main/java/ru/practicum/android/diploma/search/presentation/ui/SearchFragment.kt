@@ -8,14 +8,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.theme.VacancySearchAppTheme
 import ru.practicum.android.diploma.search.presentation.viewmodel.SearchViewModel
 
 class SearchFragment : Fragment() {
 
-    val viewModel by viewModel<SearchViewModel>()
+    val viewModel by activityViewModel<SearchViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,7 +38,7 @@ class SearchFragment : Fragment() {
         val isFavorite = viewModel.isFavorite(vacancyId)
         val args = bundleOf(
             "vacancyId" to vacancyId,
-            "openedFromFavorites" to false,
+            "openedFromFavorites" to isFavorite,
             "isFavorite" to isFavorite,
         )
         findNavController().navigate(R.id.vacancyDetailsFragment, args)

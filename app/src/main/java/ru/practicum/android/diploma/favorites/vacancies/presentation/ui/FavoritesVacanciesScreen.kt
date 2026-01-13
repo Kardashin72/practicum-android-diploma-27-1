@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.favorites.vacancies.presentation.ui
 
+import android.content.res.Resources
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.presentation.ui.components.PlaceHolder
@@ -30,7 +33,8 @@ fun FavoritesVacanciesScreen(
     val favorites by viewModel.favorites.collectAsState()
     val isError by viewModel.isError.collectAsState()
 
-    val vacancies = favorites.map { it.toVacancyListItemUi() }
+    val resources = LocalContext.current.resources
+    val vacancies = favorites.map { it.toVacancyListItemUi(resources) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -67,6 +71,7 @@ fun FavoritesVacanciesScreen(
                     VacanciesList(
                         vacancies = vacancies,
                         onVacancyClick = onOpenVacancyDetails,
+                        topPadding = 0.dp
                     )
                 }
             }
@@ -74,7 +79,7 @@ fun FavoritesVacanciesScreen(
     }
 }
 
-private fun FavoriteVacancyEntity.toVacancyListItemUi(): VacancyListItemUi =
+private fun FavoriteVacancyEntity.toVacancyListItemUi(resources: Resources): VacancyListItemUi =
     VacancyListItemUi(
         id = id,
         logoUrl = employerLogoUrl,
@@ -85,6 +90,7 @@ private fun FavoriteVacancyEntity.toVacancyListItemUi(): VacancyListItemUi =
             from = salaryFrom,
             to = salaryTo,
             currency = currency,
+            resources = resources,
         ),
         isFavorite = true,
     )
