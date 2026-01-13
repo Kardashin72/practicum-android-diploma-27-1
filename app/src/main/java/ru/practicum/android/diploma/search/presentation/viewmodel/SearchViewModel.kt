@@ -98,8 +98,14 @@ class SearchViewModel(
             interactor.getVacancies(filter).collect { result ->
                 when (result) {
                     is Result.Error -> {
-                        renderSearchState(SearchState.Content(vacanciesList, false))
-                        _paginationErrorMessage.value = result.message
+                        if (currentPage == 0 && vacanciesList.isEmpty()) {
+                            // Ошибка при первой загрузке — показываем экранный плейсхолдер
+                            renderSearchState(SearchState.Error(result.message))
+                        } else {
+                            // Ошибка при догрузке уже существующих данных — тост через paginationErrorMessage
+                            renderSearchState(SearchState.Content(vacanciesList, false))
+                            _paginationErrorMessage.value = result.message
+                        }
                     }
 
                     is Result.Success<VacancyResponse> -> {

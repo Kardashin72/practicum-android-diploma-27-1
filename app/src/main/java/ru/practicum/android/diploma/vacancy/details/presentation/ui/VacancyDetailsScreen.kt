@@ -219,7 +219,8 @@ private fun VacancyTitle(name: String) {
 
 @Composable
 private fun VacancySalary(salary: Salary) {
-    val formattedSalary = salary.format() ?: stringResource(R.string.salary_not_specified)
+    val formattedSalary =
+        salary.format() ?: stringResource(R.string.vacancy_details_salary_not_specified)
     Text(
         text = formattedSalary,
         style = CustomTypography.headlineMedium
